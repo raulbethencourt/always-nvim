@@ -9,12 +9,12 @@
 #   Empty result: empty stdout, exit code 0
 #
 # Functions:
-#   backend_get_selection()    - Return currently selected text (primary selection)
-#   backend_get_clipboard()    - Return current clipboard contents
-#   backend_set_clipboard()    - Set clipboard from stdin
-#   backend_simulate_paste()   - Simulate Ctrl+V keystroke
+#   backend_get_selection()     - Return currently selected text (primary selection)
+#   backend_get_clipboard()     - Return current clipboard contents
+#   backend_set_clipboard()     - Set clipboard from stdin
+#   backend_simulate_paste()    - Simulate Ctrl+V keystroke
 #   backend_get_active_window() - Return focused window identifier (opaque handle)
-#   backend_refocus_window()   - Refocus a previously saved window
+#   backend_refocus_window()    - Refocus a previously saved window
 
 backend_get_selection() {
   # V1: wl-paste --primary exits 1 on empty selection — normalize to exit 0

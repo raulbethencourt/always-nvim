@@ -3,7 +3,7 @@
 # shellcheck disable=SC1090,SC1091
 
 # always-nvim — Open Neovim from clipboard selection, paste back on exit
-# Init steps 1-8 per architecture spec
+# Init steps 1-14 per architecture spec
 
 NA_VERSION=0
 NA_VERSION_TO_SHOW="0.1.0"
@@ -98,3 +98,66 @@ elif [ "$backend" = "wayland" ]; then
   check_for_cmd_in_path "hyprctl" || error_exit "hyprctl is required but not found. Ensure Hyprland is installed."
   check_for_cmd_in_path "jq" || error_exit "jq is required but not found. Install: sudo apt install jq"
 fi
+
+# ── Init Step 9: Save clipboard + record source window ───────────────────────
+SAVED_CLIPBOARD=$(backend_get_clipboard)
+source_window=$(backend_get_active_window) || source_window=""
+
+# ── Init Step 10: Upgrade trap to full cleanup (placeholder — Story 2.1) ─────
+
+# ── Init Step 11: Stale file cleanup (placeholder — Story 2.2) ──────────────
+
+# ── Init Step 12: Determine mode (A = insert new / B = edit selection) ───────
+selection=$(backend_get_selection)
+
+if [ -z "$selection" ]; then
+  mode="A"
+else
+  mode="B"
+fi
+
+# ── Init Step 13: Create temp file + pre-fill (Mode B) ──────────────────────
+tmpfile=$(mktemp "/tmp/always-nvim-XXXXXX.$NA_FILETYPE")
+
+# Build Neovim args array
+nvim_args=()
+
+# Mode A: start in insert mode for immediate typing
+[ "$mode" = "A" ] && nvim_args+=(-c "startinsert")
+
+# Append user's custom Neovim args (if any)
+# shellcheck disable=SC2086
+[ -n "$NA_NVIM_ARGS" ] && nvim_args+=($NA_NVIM_ARGS)
+
+# Mode B: write selection content to temp file
+[ "$mode" = "B" ] && printf '%s' "$selection" >"$tmpfile"
+
+# ── Init Step 14: Launch terminal + Neovim (blocks until exit) ───────────────
+# shellcheck disable=SC2086
+$NA_TERMINAL_CMD nvim "${nvim_args[@]}" "$tmpfile"
+nvim_exit=$?
+
+# ── Post-Edit: Paste flow (exit 0 = success, non-zero = abort) ──────────────
+if [ "$nvim_exit" -eq 0 ]; then
+  content=$(cat "$tmpfile")
+
+  [ -n "$content" ] && {
+    # Set edited content to clipboard
+    printf '%s' "$content" | backend_set_clipboard
+
+    # Refocus source window
+    [ -n "$source_window" ] && backend_refocus_window "$source_window"
+
+    # Wait for focus to settle
+    sleep "$NA_FOCUS_DELAY"
+
+    # Simulate paste
+    backend_simulate_paste
+
+    # Wait for paste to be processed by target app
+    sleep "$NA_PASTE_DELAY"
+  }
+fi
+
+# Restore original clipboard
+printf '%s' "$SAVED_CLIPBOARD" | backend_set_clipboard

@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+# shellcheck disable=SC2314,SC2016
 
 load test_helper
 

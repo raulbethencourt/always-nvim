@@ -1,0 +1,100 @@
+#!/bin/bash
+# shellcheck shell=bash
+# shellcheck disable=SC1090,SC1091
+
+# always-nvim — Open Neovim from clipboard selection, paste back on exit
+# Init steps 1-8 per architecture spec
+
+NA_VERSION=0
+NA_VERSION_TO_SHOW="0.1.0"
+
+# ── Init Step 1: Resolve SCRIPT_DIR (symlink-safe) ──────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# ── Init Step 2: Source shell library ────────────────────────────────────────
+source "$SCRIPT_DIR/lib/.toolbox"
+
+# ── Init Step 3: Handle --help / --version ───────────────────────────────────
+parse_options 0 NA_ \
+  "--usage:${GREENF}Usage:${RESET} always-nvim [OPTIONS]\\n \
+\\n\
+Open Neovim with clipboard/selection content, paste back on exit." \
+  "--version:v:Show version and exit." \
+  "--examples:    ${GREENF}always-nvim${RESET}" \
+  -- "$@"
+shift "$((TBOPTIND))"
+
+# Print version if asked
+[ "$NA_VERSION" -gt 0 ] && {
+  printf '%s\n' "always-nvim $NA_VERSION_TO_SHOW"
+  exit 0
+}
+
+# ── Init Step 4: Parse config / set defaults ─────────────────────────────────
+# Set ALL defaults FIRST (before sourcing config)
+NA_TERMINAL_CMD="alacritty --title always-nvim -e"
+NA_BACKEND="auto"
+NA_CLEAR_PRIMARY="true"
+NA_FILETYPE="md"
+NA_NVIM_ARGS=""
+NA_PASTE_DELAY="0.2"
+NA_FOCUS_DELAY="0.1"
+
+# Then source config (overrides defaults)
+[ -f "$HOME/.config/always-nvim/config" ] && source "$HOME/.config/always-nvim/config"
+
+# ── Init Step 5: Acquire lock file (placeholder — full impl in Story 2.2) ───
+LOCK_FILE="/tmp/always-nvim.lock"
+echo $$ >"$LOCK_FILE"
+trap 'rm -f "$LOCK_FILE"' EXIT
+
+# ── Init Step 6: Detect backend ─────────────────────────────────────────────
+detect_backend() {
+  # Config override takes priority
+  [ "$NA_BACKEND" != "auto" ] && {
+    printf '%s' "$NA_BACKEND"
+    return 0
+  }
+  # Tier 1: WAYLAND_DISPLAY
+  [ -n "$WAYLAND_DISPLAY" ] && {
+    printf '%s' "wayland"
+    return 0
+  }
+  # Tier 2: XDG_SESSION_TYPE
+  [ "$XDG_SESSION_TYPE" = "wayland" ] && {
+    printf '%s' "wayland"
+    return 0
+  }
+  # Tier 3: DISPLAY (X11 fallback)
+  [ -n "$DISPLAY" ] && {
+    printf '%s' "x11"
+    return 0
+  }
+  # No display server detected
+  error_exit "No display server detected. Set NA_BACKEND=x11 or NA_BACKEND=wayland in config."
+}
+
+backend=$(detect_backend)
+
+# ── Init Step 7: Source backend file ─────────────────────────────────────────
+source "$SCRIPT_DIR/backends/${backend}.sh"
+
+# ── Init Step 8: Check dependencies ─────────────────────────────────────────
+# Extract terminal command (first word of NA_TERMINAL_CMD)
+terminal_cmd="${NA_TERMINAL_CMD%% *}"
+
+# Common dependencies
+check_for_cmd_in_path "nvim" || error_exit "nvim is required but not found. Install Neovim: https://neovim.io"
+check_for_cmd_in_path "$terminal_cmd" || error_exit "$terminal_cmd is required but not found. Install it or set NA_TERMINAL_CMD in config."
+
+# Backend-specific dependencies
+if [ "$backend" = "x11" ]; then
+  check_for_cmd_in_path "xclip" || error_exit "xclip is required but not found. Install: sudo apt install xclip"
+  check_for_cmd_in_path "xdotool" || error_exit "xdotool is required but not found. Install: sudo apt install xdotool"
+elif [ "$backend" = "wayland" ]; then
+  check_for_cmd_in_path "wl-paste" || error_exit "wl-paste is required but not found. Install: sudo apt install wl-clipboard"
+  check_for_cmd_in_path "wl-copy" || error_exit "wl-copy is required but not found. Install: sudo apt install wl-clipboard"
+  check_for_cmd_in_path "wtype" || error_exit "wtype is required but not found. Install: sudo apt install wtype"
+  check_for_cmd_in_path "hyprctl" || error_exit "hyprctl is required but not found. Ensure Hyprland is installed."
+  check_for_cmd_in_path "jq" || error_exit "jq is required but not found. Install: sudo apt install jq"
+fi

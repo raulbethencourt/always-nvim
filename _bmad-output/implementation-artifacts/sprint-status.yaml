@@ -1,0 +1,61 @@
+# generated: 2026-03-11
+# project: nvimAlways
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-03-11
+project: nvimAlways
+project_key: NOKEY
+tracking_system: file-system
+story_location: "_bmad-output/implementation-artifacts"
+
+development_status:
+  epic-1: in-progress
+  1-1-project-structure-configuration-and-backend-detection: review
+  1-2-x11-backend-implementation: ready-for-dev
+  1-3-wayland-backend-implementation: backlog
+  1-4-mode-detection-and-temp-file-preparation: backlog
+  1-5-terminal-spawn-and-neovim-orchestration: backlog
+  1-6-paste-flow-and-clipboard-restoration: backlog
+  1-7-test-helper-backend-contract-and-mode-detection-tests: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-two-phase-trap-and-cleanup-system: backlog
+  2-2-abort-detection-lock-file-and-stale-cleanup: backlog
+  2-3-cleanup-and-trap-tests: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-install-script: backlog
+  epic-3-retrospective: optional

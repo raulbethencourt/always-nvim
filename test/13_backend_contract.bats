@@ -160,7 +160,7 @@ line3" | backend_set_clipboard
   result=$(cat "$LOG_FILE.clipboard_data")
   # Must NOT have trailing newline
   local byte_count expected_count
-  byte_count=$(wc -c < "$LOG_FILE.clipboard_data")
+  byte_count=$(wc -c <"$LOG_FILE.clipboard_data")
   expected_count=$(printf '%s' "line1
 line2
 line3" | wc -c)
@@ -175,7 +175,7 @@ line2
 line3" | backend_set_clipboard
   result=$(cat "$LOG_FILE.clipboard_data")
   local byte_count expected_count
-  byte_count=$(wc -c < "$LOG_FILE.clipboard_data")
+  byte_count=$(wc -c <"$LOG_FILE.clipboard_data")
   expected_count=$(printf '%s' "line1
 line2
 line3" | wc -c)

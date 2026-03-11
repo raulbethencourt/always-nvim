@@ -20,52 +20,52 @@ MOCK_REFOCUS_ARG=""
 # ── Mock backend functions (ADC-1: 6-function interface) ─────────────────────
 
 backend_get_selection() {
-	printf '%s' "$MOCK_SELECTION"
+  printf '%s' "$MOCK_SELECTION"
 }
 
 backend_get_clipboard() {
-	printf '%s' "$MOCK_CLIPBOARD"
+  printf '%s' "$MOCK_CLIPBOARD"
 }
 
 backend_set_clipboard() {
-	cat - >"$MOCK_STATE_DIR/clipboard_set"
+  cat - >"$MOCK_STATE_DIR/clipboard_set"
 }
 
 backend_simulate_paste() {
-	MOCK_PASTE_CALLED=1
-	printf '1' >"$MOCK_STATE_DIR/paste_called"
+  MOCK_PASTE_CALLED=1
+  printf '1' >"$MOCK_STATE_DIR/paste_called"
 }
 
 backend_get_active_window() {
-	[ -z "$MOCK_WINDOW_ID" ] && return 1
-	printf '%s' "$MOCK_WINDOW_ID"
+  [ -z "$MOCK_WINDOW_ID" ] && return 1
+  printf '%s' "$MOCK_WINDOW_ID"
 }
 
 backend_refocus_window() {
-	MOCK_REFOCUS_ARG="$1"
-	printf '%s' "$1" >"$MOCK_STATE_DIR/refocus_arg"
+  MOCK_REFOCUS_ARG="$1"
+  printf '%s' "$1" >"$MOCK_STATE_DIR/refocus_arg"
 }
 
 # ── Helpers for reading captured mock state ──────────────────────────────────
 
 mock_get_clipboard_set() {
-	[ -f "$MOCK_STATE_DIR/clipboard_set" ] && cat "$MOCK_STATE_DIR/clipboard_set"
+  [ -f "$MOCK_STATE_DIR/clipboard_set" ] && cat "$MOCK_STATE_DIR/clipboard_set"
 }
 
 mock_paste_was_called() {
-	[ -f "$MOCK_STATE_DIR/paste_called" ]
+  [ -f "$MOCK_STATE_DIR/paste_called" ]
 }
 
 mock_get_refocus_arg() {
-	[ -f "$MOCK_STATE_DIR/refocus_arg" ] && cat "$MOCK_STATE_DIR/refocus_arg"
+  [ -f "$MOCK_STATE_DIR/refocus_arg" ] && cat "$MOCK_STATE_DIR/refocus_arg"
 }
 
 mock_reset() {
-	rm -rf "$MOCK_STATE_DIR"
-	MOCK_STATE_DIR=$(mktemp -d /tmp/always-nvim-mock-XXXXXX)
-	MOCK_SELECTION=""
-	MOCK_CLIPBOARD=""
-	MOCK_WINDOW_ID="12345"
-	MOCK_PASTE_CALLED=0
-	MOCK_REFOCUS_ARG=""
+  rm -rf "$MOCK_STATE_DIR"
+  MOCK_STATE_DIR=$(mktemp -d /tmp/always-nvim-mock-XXXXXX)
+  MOCK_SELECTION=""
+  MOCK_CLIPBOARD=""
+  MOCK_WINDOW_ID="12345"
+  MOCK_PASTE_CALLED=0
+  MOCK_REFOCUS_ARG=""
 }

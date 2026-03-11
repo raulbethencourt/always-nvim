@@ -17,25 +17,38 @@
 #   backend_refocus_window()   - Refocus a previously saved window
 
 backend_get_selection() {
-	return 0
+  # V1: wl-paste --primary exits 1 on empty selection — normalize to exit 0
+  local result
+  result=$(wl-paste --primary --no-newline 2>/dev/null) || true
+  printf '%s' "$result"
 }
 
 backend_get_clipboard() {
-	return 0
+  # V2: wl-paste exits 1 on empty clipboard — normalize to exit 0
+  local result
+  result=$(wl-paste --no-newline 2>/dev/null) || true
+  printf '%s' "$result"
 }
 
 backend_set_clipboard() {
-	return 0
+  # V3: Caller uses printf '%s' to avoid trailing newlines
+  wl-copy
 }
 
 backend_simulate_paste() {
-	return 0
+  wtype -M ctrl -k v -m ctrl
 }
 
 backend_get_active_window() {
-	return 0
+  # V4: Check for null/zero address from hyprctl
+  local json addr
+  json=$(hyprctl activewindow -j 2>/dev/null) || return 1
+  addr=$(printf '%s' "$json" | jq -r '.address // empty' 2>/dev/null) || return 1
+  [ -z "$addr" ] || [ "$addr" = "null" ] || [ "$addr" = "0x0" ] && return 1
+  printf '%s' "$addr"
 }
 
 backend_refocus_window() {
-	return 0
+  local window="$1"
+  [ -n "$window" ] && hyprctl dispatch focuswindow "address:$window" >/dev/null 2>&1
 }

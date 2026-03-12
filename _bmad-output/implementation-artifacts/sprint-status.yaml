@@ -52,7 +52,7 @@ development_status:
 
   epic-2: in-progress
   2-1-two-phase-trap-and-cleanup-system: review
-  2-2-abort-detection-lock-file-and-stale-cleanup: backlog
+  2-2-abort-detection-lock-file-and-stale-cleanup: done
   2-3-cleanup-and-trap-tests: backlog
   epic-2-retrospective: optional
 

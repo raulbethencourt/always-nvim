@@ -5,7 +5,7 @@ load test_helper
 @test "Task 5.1: Lock file variable defined and correct" {
   run grep -q 'LOCK_FILE=' "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  run grep -q '/tmp/always-nvim.lock' "$SCRIPT_PATH"
+  run grep -q '/tmp/always-nvim-\$EUID.lock' "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
 }
 

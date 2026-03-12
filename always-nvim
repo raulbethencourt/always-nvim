@@ -43,9 +43,14 @@ NA_FOCUS_DELAY="0.1"
 # Then source config (overrides defaults)
 [ -f "$HOME/.config/always-nvim/config" ] && source "$HOME/.config/always-nvim/config"
 
-# ── Init Step 5: Acquire lock file (placeholder — full impl in Story 2.2) ───
-LOCK_FILE="/tmp/always-nvim.lock"
-echo $$ >"$LOCK_FILE"
+# ── Init Step 5: Acquire lock file (R3) ─────────────────────────────────────
+LOCK_FILE="/tmp/always-nvim-$EUID.lock"
+[ -f "$LOCK_FILE" ] && {
+  pid=$(cat "$LOCK_FILE")
+  kill -0 "$pid" 2>/dev/null && error_exit "always-nvim is already running (PID $pid)"
+  rm -f "$LOCK_FILE"
+}
+printf '%s' $$ >"$LOCK_FILE"
 trap 'rm -f "$LOCK_FILE"' EXIT
 
 # ── Init Step 6: Detect backend ─────────────────────────────────────────────
@@ -111,7 +116,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# ── Init Step 11: Stale file cleanup (placeholder — Story 2.2) ──────────────
+# ── Init Step 11: Stale file cleanup (R2) ────────────────────────────────────
+find /tmp -name "always-nvim-*" -mmin +60 -delete 2>/dev/null
 
 # ── Init Step 12: Determine mode (A = insert new / B = edit selection) ───────
 selection=$(backend_get_selection)
@@ -141,6 +147,8 @@ nvim_exit=$?
 # ── Post-Edit: Paste flow (exit 0 = success, non-zero = abort) ──────────────
 if [ "$nvim_exit" -eq 0 ]; then
   content=$(cat "$tmpfile")
+  # AC3: Mode B no-change detection — skip paste if content unchanged (FR15)
+  [ "$mode" = "B" ] && [ "$content" = "$selection" ] && exit 0
 
   [ -n "$content" ] && {
     # R1: Persistent backup before overwrite (survives crashes for manual recovery)

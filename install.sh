@@ -15,6 +15,7 @@ if [ -f "$SCRIPT_DIR/lib/.toolbox" ]; then
   source "$SCRIPT_DIR/lib/.toolbox"
 else
   echo_error() { printf '%s\n' "ERROR: $*" >&2; }
+  GREENF="" YELLOWF="" CYANF="" BLUEF="" RESET=""
 fi
 
 # ── Verify running from repo root ───────────────────────────────────────────
@@ -32,21 +33,21 @@ mkdir -p "$INSTALL_DIR/backends" "$INSTALL_DIR/lib"
 
 cp "$SCRIPT_DIR/always-nvim" "$INSTALL_DIR/always-nvim"
 chmod +x "$INSTALL_DIR/always-nvim"
-printf '%s\n' "  Installed: always-nvim -> $INSTALL_DIR/always-nvim"
+printf '%s\n' "  ${GREENF}Installed:${RESET} always-nvim -> $INSTALL_DIR/always-nvim"
 
 cp "$SCRIPT_DIR/backends/x11.sh" "$INSTALL_DIR/backends/x11.sh"
 cp "$SCRIPT_DIR/backends/wayland.sh" "$INSTALL_DIR/backends/wayland.sh"
-printf '%s\n' "  Installed: backends/x11.sh -> $INSTALL_DIR/backends/x11.sh"
-printf '%s\n' "  Installed: backends/wayland.sh -> $INSTALL_DIR/backends/wayland.sh"
+printf '%s\n' "  ${GREENF}Installed:${RESET} backends/x11.sh -> $INSTALL_DIR/backends/x11.sh"
+printf '%s\n' "  ${GREENF}Installed:${RESET} backends/wayland.sh -> $INSTALL_DIR/backends/wayland.sh"
 
 cp -a "$SCRIPT_DIR/lib/." "$INSTALL_DIR/lib/"
-printf '%s\n' "  Installed: lib/ -> $INSTALL_DIR/lib/"
+printf '%s\n' "  ${GREENF}Installed:${RESET} lib/ -> $INSTALL_DIR/lib/"
 
 # ── Task 3: Config directory and example config ─────────────────────────────
 mkdir -p "$CONFIG_DIR"
 
 if [ -f "$CONFIG_DIR/config" ]; then
-  printf '%s\n' "  Existing config preserved: $CONFIG_DIR/config"
+  printf '%s\n' "  ${YELLOWF}Existing config preserved:${RESET} $CONFIG_DIR/config"
 else
   cat >"$CONFIG_DIR/config" <<'CONFIGEOF'
 # always-nvim configuration
@@ -77,20 +78,20 @@ else
 # Tip: set to "always-nvim/nvim" for isolated config (~/.config/always-nvim/nvim/)
 # NA_NVIM_APPNAME=""
 CONFIGEOF
-  printf '%s\n' "  Created: $CONFIG_DIR/config"
+  printf '%s\n' "  ${GREENF}Created:${RESET} $CONFIG_DIR/config"
 fi
 
 # ── Task 4: Post-install WM instructions ────────────────────────────────────
-printf '\n%s\n' "=== Window Manager Configuration ==="
+printf '\n%s\n' "${CYANF}=== Window Manager Configuration ===${RESET}"
 
-printf '\n%s\n' "--- i3 (~/.config/i3/config) ---"
+printf '\n%s\n' "${BLUEF}--- i3 (~/.config/i3/config) ---${RESET}"
 printf '%s\n' '  # Hotkey'
 printf '%s\n' '  bindsym $mod+e exec always-nvim'
 printf '%s\n' ''
 printf '%s\n' '  # Floating window rule'
 printf '%s\n' '  for_window [title="always-nvim"] floating enable, sticky enable, resize set 800 600, move position center'
 
-printf '\n%s\n' "--- Hyprland (~/.config/hypr/hyprland.conf) ---"
+printf '\n%s\n' "${BLUEF}--- Hyprland (~/.config/hypr/hyprland.conf) ---${RESET}"
 printf '%s\n' '  # Hotkey'
 printf '%s\n' '  bind = $mainMod, E, exec, always-nvim'
 printf '%s\n' ''
@@ -100,15 +101,15 @@ printf '%s\n' '  windowrulev2 = size 800 600,title:^(always-nvim)$'
 printf '%s\n' '  windowrulev2 = center,title:^(always-nvim)$'
 printf '%s\n' '  windowrulev2 = pin,title:^(always-nvim)$'
 
-printf '\n%s\n' "=== PATH Check ==="
+printf '\n%s\n' "${CYANF}=== PATH Check ===${RESET}"
 # Force path rehash so command -v sees the new binary
 hash -r 2>/dev/null || true
 
 if command -v always-nvim >/dev/null 2>&1; then
-  printf '%s\n' "  ✓ always-nvim is in your PATH"
+  printf '%s\n' "  ${GREENF}✓${RESET} always-nvim is in your PATH"
 else
-  printf '%s\n' "  ⚠ $INSTALL_DIR is NOT in your PATH. Add it to your shell profile:"
+  printf '%s\n' "  ${YELLOWF}⚠${RESET} $INSTALL_DIR is NOT in your PATH. Add it to your shell profile:"
   printf '%s\n' "    export PATH=\"\$HOME/.local/bin:\$PATH\""
 fi
 
-printf '\n%s\n' "Installation complete!"
+printf '\n%s\n' "${GREENF}Installation complete!${RESET}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck shell=bash
-# shellcheck disable=SC1091
+# shellcheck disable=SC1091,SC2016
 
 set -e
 
@@ -72,6 +72,10 @@ else
 
 # Seconds to wait after refocus before paste
 # NA_FOCUS_DELAY="0.1"
+
+# Neovim APPNAME (uses ~/.config/<appname>/ for config, empty = normal config)
+# Tip: set to "always-nvim/nvim" for isolated config (~/.config/always-nvim/nvim/)
+# NA_NVIM_APPNAME=""
 CONFIGEOF
   printf '%s\n' "  Created: $CONFIG_DIR/config"
 fi

@@ -10,3 +10,4 @@ NA_FILETYPE="md"
 NA_NVIM_ARGS=""
 NA_PASTE_DELAY="0.2"
 NA_FOCUS_DELAY="0.1"
+NA_NVIM_APPNAME=""  # Tip: set to "always-nvim/nvim" for isolated config (~/.config/always-nvim/nvim/)

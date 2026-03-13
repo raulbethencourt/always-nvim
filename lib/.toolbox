@@ -4,7 +4,7 @@
 # This file serves as the entry point for the shelltools library.
 # It sources all module files in the correct dependency order.
 #
-# Usage: source "$SHELLTOOLSPATH"/lib/.toolbox
+# Usage: source path/to/lib/.toolbox
 #
 # Module loading order (dependencies must be loaded first):
 # 1. core.sh       - Core utilities, error handling, logging
@@ -14,9 +14,13 @@
 # 5. utils.sh      - Miscellaneous utilities (threading, templating)
 # 6. validation.sh - Input validation functions
 
-source "$SHELLTOOLSPATH"/lib/core.sh
-source "$SHELLTOOLSPATH"/lib/file.sh
-source "$SHELLTOOLSPATH"/lib/options.sh
-source "$SHELLTOOLSPATH"/lib/ui.sh
-source "$SHELLTOOLSPATH"/lib/utils.sh
-source "$SHELLTOOLSPATH"/lib/validation.sh
+# Resolve directory of this script (lib/)
+# shellcheck disable=SC2155
+readonly _TOOLBOX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "$_TOOLBOX_DIR/core.sh"
+source "$_TOOLBOX_DIR/file.sh"
+source "$_TOOLBOX_DIR/options.sh"
+source "$_TOOLBOX_DIR/ui.sh"
+source "$_TOOLBOX_DIR/utils.sh"
+source "$_TOOLBOX_DIR/validation.sh"

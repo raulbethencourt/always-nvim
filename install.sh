@@ -11,7 +11,6 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # ── Source shell library for echo_error, or define fallback ──────────────────
 if [ -f "$SCRIPT_DIR/lib/.toolbox" ]; then
-  export SHELLTOOLSPATH="$SCRIPT_DIR"
   source "$SCRIPT_DIR/lib/.toolbox"
 else
   echo_error() { printf '%s\n' "ERROR: $*" >&2; }

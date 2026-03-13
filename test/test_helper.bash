@@ -13,6 +13,5 @@ check_cmd() {
 
 setup() {
 	# Set default environment variables for tests
-	export SHELLTOOLSPATH="$PROJECT_ROOT"
 	export PATH="$PROJECT_ROOT:$PATH"
 }

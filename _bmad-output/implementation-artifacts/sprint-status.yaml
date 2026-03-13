@@ -56,6 +56,9 @@ development_status:
   2-3-cleanup-and-trap-tests: done
   epic-2-retrospective: optional
 
-  epic-3: in-progress
-  3-1-install-script: ready-for-dev
+  epic-3: done
+  3-1-install-script: done
   epic-3-retrospective: optional
+
+  epic-4: done
+  4-1-nvim-appname-support: done

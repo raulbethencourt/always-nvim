@@ -164,6 +164,7 @@ NFR14: Adding a new display-server backend shall require only creating a new fil
 | FR36 | Epic 1 | `backend_get_active_window()` |
 | FR37 | Epic 1 | `backend_refocus_window()` |
 | FR38 | Epic 1 | Handle `--help` / `--version` flags |
+| FR28 | Epic 4 | Configurable NVIM_APPNAME for dedicated Neovim config directory |
 
 ## Epic List
 
@@ -180,6 +181,11 @@ The tool guarantees zero side effects on every exit path — clipboard is always
 ### Epic 3: Installation & Distribution
 The user can install always-nvim on a new machine with a single script that copies files, creates config, and shows WM-specific hotkey setup instructions for both i3 and Hyprland.
 **FRs covered:** FR29, FR30, FR31
+
+### Epic 4: Enhanced Neovim Configuration
+The user can configure always-nvim to use a dedicated Neovim config directory via the `NVIM_APPNAME` environment variable, enabling fast startup with a minimal config separate from their main Neovim setup.
+**FRs covered:** FR28 (extended)
+**NFRs addressed:** NFR1, NFR12
 
 ## Epic 1: Core Editing Loop
 
@@ -636,3 +642,37 @@ So that I can go from download to working hotkey with minimal manual steps.
 
 **And** the install script includes `# shellcheck shell=bash` directive (G3)
 **And** the script uses `echo_error()` from the shell library for error messages if the library is available, otherwise falls back to plain stderr
+
+## Epic 4: Enhanced Neovim Configuration
+
+The user can configure always-nvim to use a dedicated Neovim config directory via the `NVIM_APPNAME` environment variable, enabling fast startup with a minimal config separate from their main Neovim setup.
+**FRs covered:** FR28 (extended — new configurable option)
+**NFRs addressed:** NFR1 (startup speed improvement with minimal config), NFR12 (line budget compliance)
+
+### Story 4.1: NVIM_APPNAME Support
+
+As a user,
+I want to configure always-nvim to use a custom Neovim config directory via `NA_NVIM_APPNAME`,
+So that I can use a minimal, fast Neovim configuration for quick edits without affecting my main setup.
+
+**Acceptance Criteria:**
+
+**Given** `NA_NVIM_APPNAME` is empty or unset (default)
+**When** always-nvim launches Neovim
+**Then** `NVIM_APPNAME` is NOT exported and Neovim uses `~/.config/nvim/` as normal
+
+**Given** `NA_NVIM_APPNAME` is set to a non-empty value (e.g., `"always-nvim"`)
+**When** always-nvim launches Neovim
+**Then** `NVIM_APPNAME` is exported with that value before terminal launch, and Neovim uses `~/.config/<appname>/` for its configuration (D8)
+
+**Given** `NA_NVIM_APPNAME` is set
+**When** the terminal subprocess inherits the environment
+**Then** only `NVIM_APPNAME` is affected — no other environment variables are modified
+
+**And** the `config` reference file includes `NA_NVIM_APPNAME` with empty default
+**And** the install script's example config includes `NA_NVIM_APPNAME` with descriptive comment
+**And** `architecture.md` Config Variable Summary table includes `NA_NVIM_APPNAME`
+**And** `architecture.md` Decision log includes D8 documenting the NVIM_APPNAME approach
+**And** test coverage validates both empty and non-empty `NA_NVIM_APPNAME` behavior
+**And** the main script stays within the 300-line budget (NFR12)
+**And** the export line is placed immediately before the terminal launch command (init step 14)

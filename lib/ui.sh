@@ -31,38 +31,6 @@ readonly INVER="$(tput rev)"
 
 readonly RESET="$(tput sgr0)"
 
-# Progress Display
-print_progress() {
-  # Displays a progress bar with percentage and spinner.
-  # Args: $1=current (int), $2=full (int), $3=bar_size (opt, default 28)
-  # Returns: prints progress bar to stdout
-  BAR_FULLSIZE=${3:-28}
-  BAR_FULLSIZE=$((BAR_FULLSIZE - 8))
-  current=$1
-  full=$2
-  prefix="\r["
-  suffix="]"
-  percentFormat=""
-  sp=""
-  TB_SPIN_PROGRESS=${TB_SPIN_PROGRESS:-1}
-  spinner="${sp:TB_SPIN_PROGRESS++%${#sp}:1}"
-
-  percent=$((current * 100 / full))
-  barLength=$((current * BAR_FULLSIZE / full))
-
-  if [ $percent -ge 100 ]; then
-    suffix="\n"
-    spinner=""
-  elif [ $percent -lt 10 ]; then
-    percentFormat="2"
-  fi
-
-  bar=$(printf "%${barLength}.s" " " | sed "s/ //g")
-  barEmpty=$(printf "%$((BAR_FULLSIZE - barLength)).s" " ")
-
-  printf "${prefix}${GREENF}%s%s %s${RESET} %${percentFormat}d%%${suffix}" "$bar" "$barEmpty" "$spinner" "$percent"
-}
-
 # Text Utilities
 printcn() {
   # Prints a character a specified number of times.

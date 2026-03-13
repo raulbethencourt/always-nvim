@@ -8,11 +8,9 @@
 #
 # Module loading order (dependencies must be loaded first):
 # 1. core.sh       - Core utilities, error handling, logging
-# 2. file.sh       - File operations, path utilities, command lookup 
+# 2. file.sh       - File operations, path utilities, command lookup
 # 3. options.sh    - Command-line option parsing
-# 4. ui.sh         - User interface, colors, progress bars
-# 5. utils.sh      - Miscellaneous utilities (threading, templating)
-# 6. validation.sh - Input validation functions
+# 4. ui.sh         - User interface, colors, usage printing
 
 # Resolve directory of this script (lib/)
 # shellcheck disable=SC2155
@@ -22,5 +20,3 @@ source "$_TOOLBOX_DIR/core.sh"
 source "$_TOOLBOX_DIR/file.sh"
 source "$_TOOLBOX_DIR/options.sh"
 source "$_TOOLBOX_DIR/ui.sh"
-source "$_TOOLBOX_DIR/utils.sh"
-source "$_TOOLBOX_DIR/validation.sh"

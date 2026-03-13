@@ -39,17 +39,22 @@ load test_helper
 }
 
 @test "AC #4: Config parsing succeeds when no config file exists" {
-  # We mock HOME to an empty temp dir
+  # We mock HOME to an empty temp dir (no config file to source)
   local TEMP_HOME
   TEMP_HOME=$(mktemp -d)
 
-  run bash -c "HOME='$TEMP_HOME' WAYLAND_DISPLAY='' DISPLAY=':0' XDG_SESSION_TYPE='' timeout 1s '$SCRIPT_PATH' || true"
+  # Override NA_TERMINAL_CMD to a non-existent binary so the script fails at
+  # step 8 (dependency check) instead of reaching step 14 and spawning a real
+  # terminal window — which hangs in tmux/Alacritty environments.
+  local CFG_DIR="$TEMP_HOME/.config/always-nvim"
+  mkdir -p "$CFG_DIR"
+  printf '%s\n' 'NA_TERMINAL_CMD="__fake_terminal_for_test__"' >"$CFG_DIR/config"
 
-  # It might fail later (backend detection/deps), but shouldn't fail at config step
-  # We check output for config errors
+  run bash -c "HOME='$TEMP_HOME' WAYLAND_DISPLAY='' DISPLAY=':0' XDG_SESSION_TYPE='' '$SCRIPT_PATH'" || true
+
   rm -rf "$TEMP_HOME"
 
-  # Check that it didn't complain about config
+  # Script should fail at dep check, NOT at config parsing
   [[ ! "$output" =~ config.*error ]]
   [[ ! "$output" =~ NA_.*unset ]]
 }

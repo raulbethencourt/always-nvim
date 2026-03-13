@@ -73,7 +73,7 @@ Cleanup uses `trap cleanup EXIT` pattern. The cleanup function is idempotent (sa
 New config option `NA_CLEAR_PRIMARY` (default: `true`). When enabled, the cleanup function clears the primary selection after each invocation to mitigate stale Mode B triggers. Users who want to preserve primary selection across invocations can set this to `false`.
 
 **ADC-5: Full Toolbox Loading**
-Source the full `.toolbox` at startup rather than cherry-picking individual modules. The performance cost is negligible (<5ms against a 500ms budget). All 6 library modules together are under 1,200 lines. Selective sourcing introduces fragility if internal module dependencies change. Simplicity wins.
+Source the full `.toolbox` at startup rather than cherry-picking individual modules. The performance cost is negligible (<5ms against a 500ms budget). The library has been pruned to project needs — 4 modules under 800 lines. Selective sourcing introduces fragility if internal module dependencies change. Simplicity wins.
 
 **ADC-6: `echo` Override — Verified Safe**
 The shell library's `core.sh` redefines `echo()` to route through `toolbox_log()`. Audit confirms: stdout behavior is identical to `builtin echo` — the override only adds optional file logging when `__TOOLBOX_LOG_OUTPUT` is set (empty by default). No interference with backend function stdout data flow. Backend functions can safely use `echo` for data output. No mitigation needed.
@@ -263,14 +263,12 @@ always-nvim/
 ├── backend-x11.sh           # X11 backend (~25-30 lines)
 ├── backend-wayland.sh       # Wayland backend (~25-30 lines)
 ├── config                   # Default config (env vars, ~10 lines)
-├── lib/                     # Shell library (external, already present)
+├── lib/                     # Shell library (pruned to project needs)
 │   ├── .toolbox
 │   ├── core.sh
 │   ├── file.sh
 │   ├── options.sh
-│   ├── ui.sh
-│   ├── utils.sh
-│   └── validation.sh
+│   └── ui.sh
 └── test/
     ├── test_helper.sh       # Centralized mock functions (ADC-7/P2)
     ├── test_mode_detection.bats
@@ -333,14 +331,12 @@ always-nvim/
 │   ├── x11.sh               # X11 backend (~25-30 lines)
 │   └── wayland.sh           # Wayland backend (~25-30 lines)
 ├── config                   # Default config reference (~10 lines)
-├── lib/                     # Shell library (external)
+├── lib/                     # Shell library (pruned to project needs)
 │   ├── .toolbox
 │   ├── core.sh
 │   ├── file.sh
 │   ├── options.sh
-│   ├── ui.sh
-│   ├── utils.sh
-│   └── validation.sh
+│   └── ui.sh
 └── test/
     ├── test_helper.sh
     ├── test_mode_detection.bats
@@ -521,14 +517,12 @@ always-nvim/
 │
 ├── config                               # Default config reference file (~10 lines)
 │
-├── lib/                                 # Shell toolbox library (external, pre-existing)
+├── lib/                                 # Shell toolbox library (pruned to project needs)
 │   ├── .toolbox                         # Library loader — sources all modules
 │   ├── core.sh                          # error_exit, echo_error, echo override, logging
 │   ├── file.sh                          # check_for_cmd_in_path, in_path
 │   ├── options.sh                       # parse_options framework (post-V1)
-│   ├── ui.sh                            # ANSI colors, print utilities
-│   ├── utils.sh                         # (empty)
-│   └── validation.sh                    # Input validation (unused by always-nvim)
+│   └── ui.sh                            # ANSI colors, print utilities
 │
 ├── test/
 │   ├── test_helper.sh                   # Centralized mock backend functions
@@ -536,9 +530,6 @@ always-nvim/
 │   ├── test_clipboard.bats              # Save/restore, printf correctness
 │   ├── test_cleanup.bats                # Trap, tmpfile, lockfile, backup cleanup
 │   └── test_backend_contract.bats       # V1-V4 contract verification
-│
-├── docs/                                # (pre-existing)
-│   └── lib_example_script.sh            # Shell library usage example
 │
 └── _bmad-output/                        # BMAD planning artifacts (not shipped)
     ├── product-brief.md

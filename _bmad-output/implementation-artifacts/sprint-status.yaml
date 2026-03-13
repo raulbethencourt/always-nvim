@@ -50,12 +50,12 @@ development_status:
   1-7-test-helper-backend-contract-and-mode-detection-tests: done
   epic-1-retrospective: done
 
-  epic-2: in-progress
-  2-1-two-phase-trap-and-cleanup-system: review
+  epic-2: done
+  2-1-two-phase-trap-and-cleanup-system: done
   2-2-abort-detection-lock-file-and-stale-cleanup: done
-  2-3-cleanup-and-trap-tests: backlog
+  2-3-cleanup-and-trap-tests: done
   epic-2-retrospective: optional
 
-  epic-3: backlog
-  3-1-install-script: backlog
+  epic-3: in-progress
+  3-1-install-script: ready-for-dev
   epic-3-retrospective: optional

@@ -1,6 +1,6 @@
 # Story 2.1: Two-Phase Trap & Cleanup System
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -206,12 +206,14 @@ claude-opus-4.6 (github-copilot)
 
 ### Completion Notes List
 
-- Net +5 source lines (163→168). Line budget: 268/300 (32 remaining).
+- Net +8 source lines (163→171). Total source: 271/300. Line budget: 29 remaining.
 - Combined `rm -f "$LOCK_FILE" "/tmp/always-nvim-clipboard-backup"` on one line for efficiency.
 - Used `${SAVED_CLIPBOARD+x}` (not `-n`) to support empty clipboard restoration.
 - No `local` needed in cleanup — no new variables declared, all operations use existing globals.
 - 12 new tests added in `test/16_cleanup_system.bats` (9 structural + 3 functional).
 - Total test count: 129 (117 existing + 12 new), 0 failures.
+- Note: Functional tests in `test/16_cleanup_system.bats` use an inline copy of `cleanup()` logic due to architectural constraints preventing full script sourcing.
+- Note: `cleanup()` deliberately ignores potential clipboard restore failures to ensure file cleanup always proceeds.
 
 ### File List
 

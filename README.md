@@ -47,7 +47,7 @@ always-nvim lets you use Neovim as a universal text input tool. Press a hotkey f
 - **Adjustable timing delays** -- Fine-tune paste and focus delays for your system
 - **NVIM_APPNAME support** -- Use an isolated Neovim config for faster startup
 - **Lock file protection** -- Prevents multiple instances from running simultaneously
-- **Stale temp file cleanup** -- Automatically removes temp files older than 60 minutes
+- **Stale temp file cleanup** -- Automatically removes temp files older than 60 minutes on startup
 
 ## Requirements
 
@@ -109,7 +109,7 @@ cp -a lib/. ~/.local/bin/lib/
 mkdir -p ~/.config/always-nvim
 cp config ~/.config/always-nvim/config
 
-# Ensure ~/.local/bin is in your PATH
+# Ensure ~/.local/bin is in your PATH (add this to ~/.bashrc or ~/.zshrc)
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
@@ -119,7 +119,7 @@ The config file is located at `~/.config/always-nvim/config`. It is a plain Bash
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NA_TERMINAL_CMD` | `alacritty --title always-nvim -e` | Terminal command to launch. Must include a title flag and `-e` for command execution. |
+| `NA_TERMINAL_CMD` | `alacritty --class always-nvim --title always-nvim -e` | Terminal command to launch. Must include a title flag and `-e` for command execution. |
 | `NA_BACKEND` | `auto` | Display backend: `auto`, `x11`, or `wayland`. Auto-detection checks `WAYLAND_DISPLAY`, then `XDG_SESSION_TYPE`, then `DISPLAY`. |
 | `NA_CLEAR_PRIMARY` | `true` | Clear the primary (mouse) selection after each run. |
 | `NA_FILETYPE` | `md` | File extension for the temp file. Controls Neovim syntax highlighting. |
@@ -149,10 +149,10 @@ Add to `~/.config/i3/config`:
 
 ```
 # Hotkey
-bindsym $mod+e exec always-nvim
+bindsym $mod+e exec "always-nvim"
 
 # Floating window rule
-for_window [title="always-nvim"] floating enable, sticky enable, resize set 800 600, move position center
+for_window [class="always-nvim"] floating enable, sticky enable, resize set 1200 800, move position center
 ```
 
 ### Hyprland

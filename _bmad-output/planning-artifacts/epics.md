@@ -59,6 +59,10 @@ FR35: Each backend implements `backend_simulate_paste()` to simulate Ctrl+V keys
 FR36: Each backend implements `backend_get_active_window()` to return focused window identifier
 FR37: Each backend implements `backend_refocus_window()` to refocus a previously saved window
 FR38: The script can handle `--help` and `--version` flags before any system state changes
+FR39: The script can detect a running Neovim server and connect to it instead of cold-starting Neovim
+FR40: The script can fall back to cold-starting Neovim when no server is available
+FR41: A systemd user service can keep a headless Neovim server running for instant connection
+FR42: The project has a comprehensive README with installation, usage, configuration, and keybinding documentation
 
 ### NonFunctional Requirements
 
@@ -165,6 +169,10 @@ NFR14: Adding a new display-server backend shall require only creating a new fil
 | FR37 | Epic 1 | `backend_refocus_window()` |
 | FR38 | Epic 1 | Handle `--help` / `--version` flags |
 | FR28 | Epic 4 | Configurable NVIM_APPNAME for dedicated Neovim config directory |
+| FR39 | Epic 5 | Detect running Neovim server and connect to it |
+| FR40 | Epic 5 | Fall back to cold-start when no server available |
+| FR41 | Epic 5 | Systemd user service for headless Neovim server |
+| FR42 | Epic 5 | Comprehensive project README |
 
 ## Epic List
 
@@ -186,6 +194,11 @@ The user can install always-nvim on a new machine with a single script that copi
 The user can configure always-nvim to use a dedicated Neovim config directory via the `NVIM_APPNAME` environment variable, enabling fast startup with a minimal config separate from their main Neovim setup.
 **FRs covered:** FR28 (extended)
 **NFRs addressed:** NFR1, NFR12
+
+### Epic 5: Performance & Documentation
+The user gets performance optimization guidance (via architecture spike) plus a comprehensive README that makes the project easy to discover, install, and configure.
+**FRs covered:** FR39, FR40, FR41, FR42
+**NFRs addressed:** NFR1 (startup speed), NFR12 (line budget)
 
 ## Epic 1: Core Editing Loop
 
@@ -676,3 +689,191 @@ So that I can use a minimal, fast Neovim configuration for quick edits without a
 **And** test coverage validates both empty and non-empty `NA_NVIM_APPNAME` behavior
 **And** the main script stays within the 300-line budget (NFR12)
 **And** the export line is placed immediately before the terminal launch command (init step 14)
+
+## Epic 5: Performance & Documentation
+
+The user gets performance optimization guidance (via architecture spike) plus a comprehensive README that makes the project easy to discover, install, and configure.
+
+### Story 5.1: Neovim Server Architecture Spike
+
+As a developer,
+I want a technical design for the Neovim server daemon integration that validates the `nvim --headless --listen` + `nvim --server --remote` approach, determines the exact line budget impact, and documents the architectural decisions,
+So that the implementation story (5.2) has a clear, validated design to follow.
+
+**Acceptance Criteria:**
+
+**Given** Neovim 0.9+ supports `--headless --listen <address>` for server mode
+**When** the architecture spike investigates the server approach
+**Then** it documents the exact commands and socket path for:
+- Starting the daemon: `nvim --headless --listen /tmp/always-nvim-server.sock` (with `NA_NVIM_APPNAME` if configured)
+- Connecting from the main script: how to open a file in the running server AND display it in a new terminal window
+- Fallback: what happens when the server is not running
+
+**Given** the current runtime budget is 273/300 lines
+**When** the spike estimates the line cost
+**Then** it provides:
+- Exact line count for server detection logic in the main script
+- Whether refactoring is needed to stay within budget, or whether the NFR12 budget should be raised
+- A recommendation on budget approach
+
+**Given** the Neovim `--server` approach requires a terminal window for the UI
+**When** the spike validates the UX flow
+**Then** it documents:
+- How the terminal + server connection works (the daemon is headless, each invocation opens a NEW terminal that connects to the server)
+- Whether the floating window title (`always-nvim`) is preserved for WM rules
+- Whether cleanup/trap behavior changes (server persists across invocations)
+- How the edit → paste flow works (does `nvim --server --remote` block until the buffer is closed?)
+
+**Given** the user's normal Neovim (full config) must not be affected
+**When** the spike validates isolation
+**Then** it confirms:
+- The daemon uses `NA_NVIM_APPNAME` (or a dedicated appname) for its own config directory
+- The daemon's socket path is unique and does not conflict with any user Neovim instances
+- No environment variable pollution occurs outside the daemon process
+
+**Given** the spike needs to validate systemd integration
+**When** investigating service management
+**Then** it documents:
+- A systemd user service file (`~/.config/systemd/user/always-nvim-server.service`)
+- How `install.sh` should install/enable the service
+- How to start/stop/restart the daemon manually
+- What happens if the daemon crashes (restart policy)
+
+**And** the spike produces a written technical design document (can be appended to this story file or a separate spike doc)
+**And** the spike identifies any risks or blockers for Story 5.2
+**And** the spike validates by actually running `nvim --headless --listen /tmp/test.sock` and connecting to it manually
+
+### Story 5.2: Neovim Server Daemon Implementation — CANCELLED
+
+**Cancelled:** Story 5.1 spike determined NO-GO for the server daemon approach. Key blockers: (1) `--remote-ui` exit code always 1 — cannot distinguish `:wq` from `:cq` for paste flow, (2) `:cq` kills the server, (3) shared buffer state between invocations, (4) marginal performance gain (~72ms) vs existing `NA_NVIM_APPNAME` approach. See Story 5.1 technical design document for full analysis.
+
+~~As a user,
+I want always-nvim to automatically connect to a pre-warmed Neovim server when available, falling back to cold-start when not,
+So that my hotkey press opens Neovim near-instantly without affecting my normal Neovim workflow.
+
+**Acceptance Criteria:**
+
+**Given** a Neovim server daemon is running and listening on the configured socket path
+**When** the user presses the hotkey and always-nvim starts
+**Then** the main script detects the running server and launches the terminal with `nvim --server <socket> --remote <tmpfile>` instead of a cold `nvim` start (FR39)
+
+**Given** no Neovim server daemon is running (socket does not exist or is not responsive)
+**When** the user presses the hotkey and always-nvim starts
+**Then** the main script falls back to the existing cold-start behavior (`nvim` launched directly) with no error or degradation (FR40)
+
+**Given** the daemon mode is configurable
+**When** `NA_SERVER_ENABLED` is set to `"true"` (default: `"false"`)
+**Then** the server detection logic is active
+**And** when `NA_SERVER_ENABLED` is `"false"` or empty, the script always uses cold-start (no server detection overhead)
+
+**Given** the server socket path is configurable
+**When** `NA_SERVER_SOCKET` is set
+**Then** the main script looks for the server at that path
+**And** the default is `/tmp/always-nvim-server.sock`
+
+**Given** `NA_NVIM_APPNAME` is configured
+**When** the daemon starts
+**Then** `NVIM_APPNAME` is exported so the daemon uses `~/.config/<appname>/` for its config, completely isolated from the user's normal Neovim
+
+**Given** the server daemon is running
+**When** multiple hotkey presses occur sequentially
+**Then** each invocation connects to the SAME daemon, opens a new buffer, and the daemon persists across invocations
+
+**Given** the implementation modifies the main script
+**When** the line budget is checked
+**Then** the script remains within the NFR12 budget (or the budget has been explicitly raised per the spike's recommendation)
+
+**Given** the daemon needs a systemd user service
+**When** `install.sh` runs
+**Then** it optionally installs `always-nvim-server.service` to `~/.config/systemd/user/` and prompts to enable it (FR41)
+
+**Given** the daemon crashes or is killed
+**When** the systemd service is configured
+**Then** it restarts automatically (`Restart=on-failure`)
+
+**Given** the implementation is testable
+**When** tests run
+**Then** they verify: server detection with mock socket, fallback when no socket, config variable parsing, service file correctness
+
+**And** the `config` reference file includes `NA_SERVER_ENABLED` and `NA_SERVER_SOCKET` with defaults
+**And** the install script's example config includes the new variables with descriptive comments
+**And** `architecture.md` is updated with a D9 decision documenting the server approach
+**And** all existing 188 tests continue to pass (zero regressions)
+**And** the user's normal Neovim usage is completely unaffected
+**And** the floating window title remains `always-nvim` for WM rule matching
+**And** cleanup/trap behavior works correctly (temp file cleanup, clipboard restore — the daemon itself is NOT cleaned up by the script)~~
+
+### Story 5.3: Project README
+
+As a user,
+I want a comprehensive, well-structured README.md that explains what always-nvim does, how to install it, how to use it, and how to configure it,
+So that I can quickly understand and set up the tool on a new machine.
+
+**Acceptance Criteria:**
+
+**Given** the project has no README.md
+**When** this story is implemented
+**Then** a `README.md` exists at the repository root with the following sections:
+
+**Given** the README has a header section
+**When** a user first visits the repository
+**Then** they see:
+- Project name and a one-line description
+- A brief "what it does" paragraph (open Neovim from anywhere, edit text, paste back)
+- A visual or textual diagram showing the workflow (hotkey → floating Neovim → edit → paste back)
+
+**Given** the README has a features section
+**When** a user wants to understand capabilities
+**Then** they see:
+- Dual mode: insert new text (Mode A) or edit selected text (Mode B)
+- X11 and Wayland/Hyprland support
+- Automatic clipboard save/restore (zero side effects)
+- Configurable terminal, filetype, Neovim args, delays
+- NVIM_APPNAME support for dedicated Neovim config (with performance tips)
+- Lock file prevents double invocation
+- Stale file cleanup
+
+**Given** the README has a requirements section
+**When** a user checks prerequisites
+**Then** they see:
+- Bash 4.0+
+- Neovim 0.9+
+- Terminal emulator (Alacritty default, configurable)
+- X11 tools: xclip, xdotool
+- Wayland tools: wl-clipboard, wtype, hyprctl (Hyprland), jq
+
+**Given** the README has an installation section
+**When** a user wants to install
+**Then** they see:
+- Clone the repository
+- Run `./install.sh`
+- What the install script does (copies files, creates config, shows WM snippets)
+- Manual installation alternative
+
+**Given** the README has a configuration section
+**When** a user wants to customize
+**Then** they see:
+- Config file location (`~/.config/always-nvim/config`)
+- Table of ALL `NA_*` variables with defaults and descriptions
+- Example config file content
+
+**Given** the README has a keybindings section
+**When** a user wants to set up their window manager
+**Then** they see:
+- i3 configuration: hotkey binding + floating window rules
+- Hyprland configuration: hotkey binding + windowrulev2 rules
+- Explanation of the `always-nvim` window title used for WM matching
+
+**Given** the README has a usage section
+**When** a user wants to understand how to use the tool
+**Then** they see:
+- Basic usage: press hotkey, edit, save to paste back, quit to abort
+- Mode A (insert new): no text selected → empty Neovim in insert mode
+- Mode B (edit selection): text selected → Neovim with selection loaded
+- Abort: `:q!` or `:cq` to cancel without pasting
+- Command-line flags: `--help`, `--version`
+
+**And** the README uses clear Markdown formatting with headers, code blocks, and tables
+**And** the README is user-friendly and approachable (not overly technical)
+**And** the README does not include internal architecture details (those live in architecture.md)
+**And** the tone is professional but friendly

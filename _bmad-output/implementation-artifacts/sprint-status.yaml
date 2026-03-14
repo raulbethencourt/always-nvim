@@ -54,11 +54,17 @@ development_status:
   2-1-two-phase-trap-and-cleanup-system: done
   2-2-abort-detection-lock-file-and-stale-cleanup: done
   2-3-cleanup-and-trap-tests: done
-  epic-2-retrospective: optional
+  epic-2-retrospective: done
 
   epic-3: done
   3-1-install-script: done
-  epic-3-retrospective: optional
+  epic-3-retrospective: done
 
   epic-4: done
   4-1-nvim-appname-support: done
+  epic-4-retrospective: done
+
+  epic-5: in-progress
+  5-1-neovim-server-architecture-spike: done
+  5-2-neovim-server-daemon-implementation: cancelled
+  5-3-project-readme: review

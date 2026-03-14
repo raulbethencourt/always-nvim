@@ -309,6 +309,7 @@ All 7 decisions below are critical — each affects the main script's structure.
 | D6 | Clipboard restore timing | Configurable delay `NA_PASTE_DELAY` | `0.2` (seconds) | Prevents paste race condition. App processes Ctrl+V asynchronously; delay ensures edited text is read before clipboard is restored. |
 | D7 | Missing config handling | Silent fallback to defaults | — | Zero friction. If config file exists, source it. If not, defaults apply. No warnings, no auto-creation. |
 | D8 | Neovim config isolation | NVIM_APPNAME env var via NA_NVIM_APPNAME | (empty) | Neovim 0.9+ natively supports NVIM_APPNAME. When set, Neovim reads ~/.config/<appname>/ instead of ~/.config/nvim/. Empty default = no change. Opt-in for minimal configs. |
+| D9 | Neovim server daemon | `nvim --headless --listen` + `nvim --server --remote` | disabled (`NA_SERVER_ENABLED="false"`) | Pre-warms a headless Neovim process for near-instant startup. Main script detects server socket and connects instead of cold-starting. Falls back gracefully when server unavailable. Uses NA_NVIM_APPNAME for config isolation. |
 
 ### Config Variable Summary
 
@@ -321,6 +322,8 @@ All 7 decisions below are critical — each affects the main script's structure.
 | `NA_NVIM_ARGS` | (empty) | Additional args passed to Neovim |
 | `NA_PASTE_DELAY` | `0.2` | Seconds to wait after paste before clipboard restore |
 | `NA_NVIM_APPNAME` | (empty) | Neovim APPNAME — uses ~/.config/<appname>/ for config (D8) |
+| `NA_SERVER_ENABLED` | `false` | Enable Neovim server daemon detection (D9) |
+| `NA_SERVER_SOCKET` | `/tmp/always-nvim-server.sock` | Socket path for Neovim server daemon (D9) |
 
 ### Updated Project Structure
 

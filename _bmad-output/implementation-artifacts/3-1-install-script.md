@@ -32,9 +32,9 @@ So that I can go from download to working hotkey with minimal manual steps.
 
 ### Action Items
 
-- [ ] [AI-Review][High] Add `set -e` or check exit codes for file operations (mkdir, cp). Currently script continues if copy fails.
-- [ ] [AI-Review][Medium] Fix PATH check logic: strict string matching `case ":$PATH:"` fails if PATH contains unexpanded tildes or variables, or if `INSTALL_DIR` is not absolute.
-- [ ] [AI-Review][Low] Ensure `cp -r "$SCRIPT_DIR/lib/."` copies hidden files correctly (if any exist besides `.toolbox`). Consider more robust copy or explicit glob.
+- [x] [AI-Review][High] Add `set -e` or check exit codes for file operations (mkdir, cp). Currently script continues if copy fails.
+- [x] [AI-Review][Medium] Fix PATH check logic: strict string matching `case ":$PATH:"` fails if PATH contains unexpanded tildes or variables, or if `INSTALL_DIR` is not absolute.
+- [x] [AI-Review][Low] Ensure `cp -r "$SCRIPT_DIR/lib/."` copies hidden files correctly (if any exist besides `.toolbox`). Consider more robust copy or explicit glob.
 
 ### Severity Breakdown
 - **High:** 1
@@ -49,7 +49,7 @@ So that I can go from download to working hotkey with minimal manual steps.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create `install.sh` with header and safety checks (AC: #6, #7)
+- [x] Task 1: Create `install.sh` with header and safety checks (AC: #6, #7)
   - [x] 1.1: Add shebang `#!/bin/bash`, `# shellcheck shell=bash`, brief description comment
   - [x] 1.2: Resolve `SCRIPT_DIR` (same symlink-safe pattern as main script)
   - [x] 1.3: Source `lib/.toolbox` if available for `echo_error()`, else define stderr fallback
@@ -290,8 +290,9 @@ claude-opus-4.6 (github-copilot)
 
 - 2026-03-13: Story 3.1 implementation — created `install.sh` and `test/19_install_script.bats`
 - 2026-03-13: Code Review fixes — added `set -e`, used `cp -a`, improved PATH check logic, added tests
+- 2026-03-14: Post-implementation code review (0H/3M/3L) — fixed Task 1 parent checkbox, synced Action Items checkboxes with Review Follow-ups, corrected File List line count (~90 → 114)
 
 ### File List
 
-- `install.sh` — CREATED: install script (~90 lines)
+- `install.sh` — CREATED: install script (114 lines)
 - `test/19_install_script.bats` — CREATED: 18 tests (3 structural + 15 functional)

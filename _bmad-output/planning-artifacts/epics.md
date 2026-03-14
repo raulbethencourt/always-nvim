@@ -656,7 +656,41 @@ So that I can go from download to working hotkey with minimal manual steps.
 **And** the install script includes `# shellcheck shell=bash` directive (G3)
 **And** the script uses `echo_error()` from the shell library for error messages if the library is available, otherwise falls back to plain stderr
 
-## Epic 4: Enhanced Neovim Configuration
+### Story 3.2: Install Path & Symlink
+
+As a user,
+I want the install script to place files in a proper application directory (not flat in `~/.local/bin/`) and create a symbolic link at `/usr/local/bin/always-nvim` pointing to the installed binary,
+So that `always-nvim` is accessible from window manager hotkeys (whose `$PATH` includes `/usr/local/bin` but not `~/.local/bin`) without manual symlink setup.
+
+**Acceptance Criteria:**
+
+**Given** the user runs `./install.sh` from the repository root
+**When** the install script executes
+**Then** it installs all files (main script, backends/, lib/) to a proper application directory (e.g., `~/.local/share/always-nvim/`) preserving the relative directory structure
+
+**Given** the install script completes file installation
+**When** symlink creation runs
+**Then** it creates a symbolic link at `/usr/local/bin/always-nvim` pointing to the installed main script, using `sudo` if necessary
+
+**Given** a symlink already exists at `/usr/local/bin/always-nvim`
+**When** the install script runs
+**Then** it updates the symlink to point to the new install location (idempotent)
+
+**Given** the user has an existing installation in the old location (`~/.local/bin/`)
+**When** the install script detects old files
+**Then** it prints a message suggesting manual cleanup of the old location (does NOT auto-delete)
+
+**Given** the symlink at `/usr/local/bin/always-nvim` is followed by the main script
+**When** `SCRIPT_DIR` is resolved at runtime
+**Then** the existing `readlink -f` resolution correctly resolves through the symlink to find `lib/.toolbox` and `backends/` relative to the real script location
+
+**Given** the install directory is configurable
+**When** `INSTALL_DIR` environment variable is set
+**Then** it overrides the default application directory (for testability)
+
+**And** the install script preserves all existing functionality (config creation, WM snippets, PATH check)
+**And** the symlink target (`/usr/local/bin/`) is standard for system-wide binaries accessible to all shells and window managers
+**And** tests cover the new install path, symlink creation, and old-location detection
 
 The user can configure always-nvim to use a dedicated Neovim config directory via the `NVIM_APPNAME` environment variable, enabling fast startup with a minimal config separate from their main Neovim setup.
 **FRs covered:** FR28 (extended — new configurable option)

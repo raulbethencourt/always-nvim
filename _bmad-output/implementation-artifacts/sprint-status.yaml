@@ -56,8 +56,9 @@ development_status:
   2-3-cleanup-and-trap-tests: done
   epic-2-retrospective: done
 
-  epic-3: done
+  epic-3: in-progress
   3-1-install-script: done
+  3-2-install-path-and-symlink: review
   epic-3-retrospective: done
 
   epic-4: done

@@ -1,6 +1,6 @@
 # Story 5.3: Project README
 
-Status: review
+Status: done
 
 ## Story
 
@@ -71,6 +71,12 @@ so that I can quickly understand and set up the tool on a new machine.
   - [x] 7.1: Review formatting, headers, code blocks, tables
   - [x] 7.2: Verify user-friendly tone, no internal architecture details
   - [x] 7.3: Ensure all NA_* variables from config reference are documented
+
+
+- [x] Task 8: Code Review Fixes (AI)
+  - [x] 8.1: Correct NA_TERMINAL_CMD default in README table (added --class flag)
+  - [x] 8.2: Clarify manual PATH export instructions
+  - [x] 8.3: Clarify stale cleanup timing (on startup)
 
 ## Dev Notes
 
@@ -203,4 +209,5 @@ No debug issues encountered. Documentation-only story, no code changes.
 
 ## Change Log
 
-- 2026-03-13: Created README.md with complete user documentation covering all acceptance criteria (AC #1-#13)
+
+- 2026-03-14: Performed code review and applied 3 documentation fixes (NA_TERMINAL_CMD default, PATH instructions, stale cleanup clarity).

@@ -39,12 +39,13 @@ claude-opus-4.6 (github-copilot)
 - Init step 14: `$NA_TERMINAL_CMD nvim "${nvim_args[@]}" "$tmpfile"` — synchronous, blocks until exit.
 - Exit code captured in `nvim_exit=$?` for use by Story 1.6 post-edit logic.
 - `SC2086` disabled for `$NA_TERMINAL_CMD` (intentional word-splitting of terminal command + flags).
-- 5 new BATS structural tests, all passing.
-- Full suite: 72/72 passing.
+- 9 BATS tests (5 structural + 4 behavioral), all passing.
+- Full suite: 192/192 passing.
 
 ### File List
-- always-nvim (modified) — Init step 14 added (4 lines)
-- test/10_terminal_spawn.bats (new) — 5 BATS tests for terminal spawn
+- always-nvim (modified) — Init step 14 added (lines 145-149, 4 lines)
+- test/10_terminal_spawn.bats (new) — 9 BATS tests for terminal spawn
 
 ## Change Log
 - 2026-03-11: Story 1.5 implemented — terminal spawn with nvim, exit code capture, 5 BATS tests, all 72 tests passing.
+- 2026-03-14: [AI-Review] Tests rewritten: renamed from "Story 1.5:" to "terminal-spawn:" convention, added 4 behavioral tests (command structure, SC2086 placement, exit code flow, NVIM_APPNAME ordering). Updated test count and full suite count. 192/192 passing.

@@ -300,10 +300,16 @@ load test_helper
   chmod 500 "$symlink_dir"
 
   run bash -c "
+    # Mock sudo to ensure failure without interactive prompt
+    mkdir -p '$test_home/mock-bin'
+    echo '#!/bin/bash' > '$test_home/mock-bin/sudo'
+    echo 'exit 1' >> '$test_home/mock-bin/sudo'
+    chmod +x '$test_home/mock-bin/sudo'
+
     export HOME='$test_home'
     export INSTALL_DIR='$test_home/.local/share/always-nvim'
     export SYMLINK_DIR='$symlink_dir'
-    export PATH='/usr/bin:/bin'
+    export PATH='$test_home/mock-bin:/usr/bin:/bin'
     bash '$PROJECT_ROOT/install.sh'
   "
 

@@ -8,7 +8,7 @@ load test_helper
 }
 
 @test "Task 2: SCRIPT_DIR uses symlink-safe resolution" {
-  run grep -q 'cd "$(dirname "$0")"' "$SCRIPT_PATH"
+  run grep -q 'readlink -f "$0"' "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
 }
 

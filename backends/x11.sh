@@ -44,3 +44,8 @@ backend_refocus_window() {
   local window="$1"
   [ -n "$window" ] && xdotool windowactivate "$window"
 }
+
+backend_clear_primary() {
+  # Clear primary selection to prevent stale data triggering Mode B (ADC-4)
+  printf '' | xclip -selection primary -i
+}

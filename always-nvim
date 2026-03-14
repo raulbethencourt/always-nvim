@@ -9,7 +9,7 @@ NA_VERSION=0
 NA_VERSION_TO_SHOW="0.1.0"
 
 # ── Init Step 1: Resolve SCRIPT_DIR (symlink-safe) ──────────────────────────
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 
 # ── Init Step 2: Source shell library ────────────────────────────────────────
 source "$SCRIPT_DIR/lib/.toolbox"
@@ -32,7 +32,7 @@ shift "$((TBOPTIND))"
 
 # ── Init Step 4: Parse config / set defaults ─────────────────────────────────
 # Set ALL defaults FIRST (before sourcing config)
-NA_TERMINAL_CMD="alacritty --title always-nvim -e"
+NA_TERMINAL_CMD="alacritty --class always-nvim --title always-nvim -e"
 NA_BACKEND="auto"
 NA_CLEAR_PRIMARY="true"
 NA_FILETYPE="md"
@@ -122,6 +122,8 @@ find /tmp -name "always-nvim-*" -mmin +60 -delete 2>/dev/null
 
 # ── Init Step 12: Determine mode (A = insert new / B = edit selection) ───────
 selection=$(backend_get_selection)
+# ADC-4: Clear primary selection to prevent stale data on next invocation
+[ "$NA_CLEAR_PRIMARY" = "true" ] && backend_clear_primary
 [ -z "$selection" ] && mode="A" || mode="B"
 
 # ── Init Step 13: Create temp file + pre-fill (Mode B) ──────────────────────

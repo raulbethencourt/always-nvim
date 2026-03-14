@@ -52,3 +52,8 @@ backend_refocus_window() {
   local window="$1"
   [ -n "$window" ] && hyprctl dispatch focuswindow "address:$window" >/dev/null 2>&1
 }
+
+backend_clear_primary() {
+  # Clear primary selection to prevent stale data triggering Mode B (ADC-4)
+  printf '' | wl-copy --primary
+}

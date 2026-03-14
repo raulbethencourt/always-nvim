@@ -1,5 +1,34 @@
 # always-nvim
 
+<!--toc:start-->
+- [always-nvim](#always-nvim)
+  - [What It Does](#what-it-does)
+  - [Features](#features)
+  - [Requirements](#requirements)
+    - [Common](#common)
+    - [X11](#x11)
+    - [Wayland (Hyprland)](#wayland-hyprland)
+  - [Installation](#installation)
+    - [Quick Install](#quick-install)
+    - [What the Install Script Does](#what-the-install-script-does)
+    - [Manual Installation](#manual-installation)
+  - [Configuration](#configuration)
+    - [Example Config](#example-config)
+  - [Window Manager Setup](#window-manager-setup)
+    - [i3](#i3)
+    - [Hyprland](#hyprland)
+    - [Other Window Managers](#other-window-managers)
+  - [Usage](#usage)
+    - [Mode A: Insert New Text](#mode-a-insert-new-text)
+    - [Mode B: Edit Selected Text](#mode-b-edit-selected-text)
+    - [Aborting](#aborting)
+    - [Command-Line Flags](#command-line-flags)
+  - [Performance Tips](#performance-tips)
+    - [1. Set the APPNAME in your config](#1-set-the-appname-in-your-config)
+    - [2. Create a minimal init.lua](#2-create-a-minimal-initlua)
+  - [License](#license)
+<!--toc:end-->
+
 Edit anywhere with Neovim -- a floating terminal that captures your clipboard, opens Neovim, and pastes the result back.
 
 ## What It Does
@@ -141,7 +170,8 @@ NA_NVIM_APPNAME="always-nvim/nvim"
 
 ## Window Manager Setup
 
-always-nvim opens in a terminal window with the title `always-nvim`. Your window manager can match this title to apply floating rules so the editor appears as a centered overlay.
+always-nvim opens in a terminal window with the title `always-nvim`. Your window manager can match
+this title to apply floating rules so the editor appears as a centered overlay.
 
 ### i3
 
@@ -172,7 +202,9 @@ windowrulev2 = pin,title:^(always-nvim)$
 
 ### Other Window Managers
 
-The key concept is the same for any WM: match the window title `always-nvim` and set it to float. The title is set by the `--title` flag in `NA_TERMINAL_CMD`. If you use a different terminal, make sure its title flag is included in your `NA_TERMINAL_CMD` value.
+The key concept is the same for any WM: match the window title `always-nvim` and set it to float.
+The title is set by the `--title` flag in `NA_TERMINAL_CMD`. If you use a different terminal, make
+sure its title flag is included in your `NA_TERMINAL_CMD` value.
 
 ## Usage
 
@@ -184,13 +216,17 @@ always-nvim
 
 ### Mode A: Insert New Text
 
-When no text is selected, always-nvim opens an empty buffer in insert mode. Type your content, then save and quit (`:wq`). The text is pasted at your cursor position in the source application.
+When no text is selected, always-nvim opens an empty buffer in insert mode. Type your content, then
+save and quit (`:wq`). The text is pasted at your cursor position in the source application.
 
 ### Mode B: Edit Selected Text
 
-When text is selected (highlighted) in any application, always-nvim reads the selection into a temp file. Edit the content in Neovim, then save and quit (`:wq`). The edited text replaces the original selection.
+When text is selected (highlighted) in any application, always-nvim reads the selection into a temp
+file. Edit the content in Neovim, then save and quit (`:wq`). The edited text replaces the original
+selection.
 
-If you save without making changes in Mode B, nothing is pasted -- the operation is silently skipped.
+If you save without making changes in Mode B, nothing is pasted -- the operation is silently
+skipped.
 
 ### Aborting
 
@@ -210,9 +246,11 @@ always-nvim --version    Show version number
 
 ## Performance Tips
 
-The biggest startup cost is the terminal emulator itself (~184ms for Alacritty). The second biggest cost is Neovim loading your full configuration (~134ms with a typical plugin setup).
+The biggest startup cost is the terminal emulator itself (~184ms for Alacritty). The second biggest
+cost is Neovim loading your full configuration (~134ms with a typical plugin setup).
 
-You can reduce Neovim's startup time to ~14ms (a 90% reduction) by using an isolated, minimal config via `NA_NVIM_APPNAME`:
+You can reduce Neovim's startup time to ~14ms (a 90% reduction) by using an isolated, minimal config
+via `NA_NVIM_APPNAME`:
 
 ### 1. Set the APPNAME in your config
 
@@ -244,8 +282,5 @@ vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
 ```
 
-This skips all plugins, LSP, treesitter, and other heavy startup work, giving you a near-instant editor for quick edits.
-
-## License
-
-MIT
+This skips all plugins, LSP, treesitter, and other heavy startup work, giving you a near-instant
+editor for quick edits.

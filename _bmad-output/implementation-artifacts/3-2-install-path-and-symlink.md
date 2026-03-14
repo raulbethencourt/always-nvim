@@ -1,6 +1,6 @@
 # Story 3.2: Install Path & Symlink
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -226,13 +226,14 @@ claude-opus-4.6 (github-copilot)
 - Task 4: Updated all 18 existing tests to use new paths + `SYMLINK_DIR` override; added 8 new tests (symlink creation, target correctness, idempotency, symlink output message, old location warning, no false warning, symlink-is-a-symlink guard, runtime resolution)
 - Task 5: Added dedicated test verifying `readlink -f` through symlink resolves to correct `SCRIPT_DIR` and finds `lib/.toolbox` and `backends/`
 - Two pre-existing test assertions were out of sync with actual `install.sh` output (i3 snippet used `class` not `title`, and `exec "always-nvim"` not `exec always-nvim`) — corrected to match actual source
-- Total tests: 200 (was 188), all passing, 0 regressions
-- `install.sh` grew from 114 to 138 lines
+- Review Fixes: Added root user check/warning, robust parent directory creation/permission checks, synced config defaults with main script, and improved PATH failure messages
+- Total tests: 202 (was 188), all passing, 0 regressions
+- `install.sh` grew from 114 to ~175 lines
 
 ### Change Log
 
-- `install.sh`: Changed `INSTALL_DIR` default from `$HOME/.local/bin` to `$HOME/.local/share/always-nvim`; added `SYMLINK_DIR` variable with writable-check and sudo fallback; added old location detection block; updated PATH check message to reference symlink dir
-- `test/19_install_script.bats`: Updated all existing test paths from `.local/bin` to `.local/share/always-nvim`; added `SYMLINK_DIR` override to all tests; added 8 new tests for symlink and old-location features; fixed 2 i3 snippet assertions to match actual output
+- `install.sh`: Changed `INSTALL_DIR` default from `$HOME/.local/bin` to `$HOME/.local/share/always-nvim`; added `SYMLINK_DIR` variable with writable-check and sudo fallback; added old location detection block; updated PATH check message to reference symlink dir; added root check; added robust directory creation
+- `test/19_install_script.bats`: Updated all existing test paths from `.local/bin` to `.local/share/always-nvim`; added `SYMLINK_DIR` override to all tests; added 8 new tests for symlink and old-location features; fixed 2 i3 snippet assertions to match actual output; added tests for root warning and directory permissions
 
 ### File List
 

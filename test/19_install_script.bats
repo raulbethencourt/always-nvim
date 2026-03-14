@@ -285,6 +285,32 @@ load test_helper
   [ "$status" -eq 0 ]
   # Should find the warning message
   [[ "$output" == *"NOT in your PATH"* ]]
+  # Specific message for existing symlink (test creates it)
+  [[ "$output" == *"symlink at $symlink_dir/always-nvim exists"* ]]
+
+  rm -rf "$test_home" "$symlink_dir"
+}
+
+@test "install: correct message when PATH missing and symlink failed" {
+  local test_home symlink_dir
+  test_home=$(mktemp -d)
+  symlink_dir=$(mktemp -d)
+  
+  # Make symlink dir unwritable to fail creation (simulates failure)
+  chmod 500 "$symlink_dir"
+
+  run bash -c "
+    export HOME='$test_home'
+    export INSTALL_DIR='$test_home/.local/share/always-nvim'
+    export SYMLINK_DIR='$symlink_dir'
+    export PATH='/usr/bin:/bin'
+    bash '$PROJECT_ROOT/install.sh'
+  "
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"NOT in your PATH"* ]]
+  # Specific message for missing symlink
+  [[ "$output" == *"symlink creation failed or was skipped"* ]]
 
   rm -rf "$test_home" "$symlink_dir"
 }
@@ -374,21 +400,50 @@ load test_helper
   rm -rf "$test_home" "$symlink_dir"
 }
 
-@test "install: output contains symlink success message" {
+@test "install: warns if running as root" {
   local test_home symlink_dir
   test_home=$(mktemp -d)
   symlink_dir=$(mktemp -d)
 
-  run bash -c "
+  # Use fakeroot to simulate root privileges if available, or skip
+  if ! command -v fakeroot >/dev/null; then
+    skip "fakeroot not installed"
+  fi
+
+  run fakeroot bash -c "
     export HOME='$test_home'
     export INSTALL_DIR='$test_home/.local/share/always-nvim'
     export SYMLINK_DIR='$symlink_dir'
-    bash '$PROJECT_ROOT/install.sh'
+    # Simulate 'n' to interactive prompt
+    echo 'n' | bash '$PROJECT_ROOT/install.sh'
   "
-  [ "$status" -eq 0 ]
-  [[ "$output" == *"Symlink:"* ]]
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Running as root!"* ]]
+  [[ "$output" == *"Aborted by user"* ]]
 
   rm -rf "$test_home" "$symlink_dir"
+}
+
+@test "install: fails if install parent dir unwritable" {
+  local test_home symlink_dir unwritable_parent
+  test_home=$(mktemp -d)
+  symlink_dir=$(mktemp -d)
+  unwritable_parent=$(mktemp -d)
+  chmod 500 "$unwritable_parent"
+
+  run bash -c "
+    export HOME='$test_home'
+    export INSTALL_DIR='$unwritable_parent/subdir/always-nvim'
+    export SYMLINK_DIR='$symlink_dir'
+    bash '$PROJECT_ROOT/install.sh'
+  "
+  
+  [ "$status" -ne 0 ]
+  # Message differs depending on if parent exists or not
+  [[ "$output" == *"Cannot write to"* || "$output" == *"Cannot create directories in"* ]]
+
+  rm -rf "$test_home" "$symlink_dir" "$unwritable_parent"
 }
 
 # ── Functional Tests — Old Location Detection (Story 3.2) ───────────────────

@@ -4,7 +4,7 @@
 
 set -e
 
-# install.sh — Install always-nvim to ~/.local/bin with config and WM instructions
+# install.sh — Install always-nvim to ~/.local/share/always-nvim with symlink in /usr/local/bin
 
 # ── Resolve script directory (symlink-safe) ──────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -24,10 +24,11 @@ fi
 }
 
 # ── Configuration ────────────────────────────────────────────────────────────
-INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/share/always-nvim}"
+SYMLINK_DIR="${SYMLINK_DIR:-/usr/local/bin}"
 CONFIG_DIR="$HOME/.config/always-nvim"
 
-# ── Task 2: Install files ───────────────────────────────────────────────────
+# ── Install files to application directory ──────────────────────────────────
 mkdir -p "$INSTALL_DIR/backends" "$INSTALL_DIR/lib"
 
 cp "$SCRIPT_DIR/always-nvim" "$INSTALL_DIR/always-nvim"
@@ -42,7 +43,29 @@ printf '%s\n' "  ${GREENF}Installed:${RESET} backends/wayland.sh -> $INSTALL_DIR
 cp -a "$SCRIPT_DIR/lib/." "$INSTALL_DIR/lib/"
 printf '%s\n' "  ${GREENF}Installed:${RESET} lib/ -> $INSTALL_DIR/lib/"
 
-# ── Task 3: Config directory and example config ─────────────────────────────
+# ── Create symlink in system PATH ───────────────────────────────────────────
+if [ -w "$SYMLINK_DIR" ]; then
+  ln -sf "$INSTALL_DIR/always-nvim" "$SYMLINK_DIR/always-nvim"
+  printf '%s\n' "  ${GREENF}Symlink:${RESET} $SYMLINK_DIR/always-nvim -> $INSTALL_DIR/always-nvim"
+else
+  if sudo ln -sf "$INSTALL_DIR/always-nvim" "$SYMLINK_DIR/always-nvim"; then
+    printf '%s\n' "  ${GREENF}Symlink:${RESET} $SYMLINK_DIR/always-nvim -> $INSTALL_DIR/always-nvim"
+  else
+    printf '%s\n' "  ${YELLOWF}⚠ Could not create symlink in $SYMLINK_DIR (sudo failed)${RESET}"
+    printf '%s\n' "  ${YELLOWF}Create it manually:${RESET} sudo ln -sf '$INSTALL_DIR/always-nvim' '$SYMLINK_DIR/always-nvim'"
+  fi
+fi
+
+# ── Detect old install location and warn ────────────────────────────────────
+[ -f "$HOME/.local/bin/always-nvim" ] && [ ! -L "$HOME/.local/bin/always-nvim" ] && {
+  printf '\n%s\n' "  ${YELLOWF}⚠ Old installation detected at ~/.local/bin/${RESET}"
+  printf '%s\n' "  You can remove old files:"
+  printf '%s\n' "    rm ~/.local/bin/always-nvim"
+  printf '%s\n' "    rm -rf ~/.local/bin/backends"
+  printf '%s\n' "    rm -rf ~/.local/bin/lib"
+}
+
+# ── Config directory and example config ─────────────────────────────────────
 mkdir -p "$CONFIG_DIR"
 
 if [ -f "$CONFIG_DIR/config" ]; then
@@ -53,7 +76,7 @@ else
 # Uncomment and edit variables to override defaults
 
 # Terminal command (must accept -e flag for command execution)
-# NA_TERMINAL_CMD="alacritty --title always-nvim -e"
+# NA_TERMINAL_CMD="alacritty --class always-nvim --title always-nvim -e"
 
 # Force backend: auto, x11, or wayland
 # NA_BACKEND="auto"
@@ -80,15 +103,15 @@ CONFIGEOF
   printf '%s\n' "  ${GREENF}Created:${RESET} $CONFIG_DIR/config"
 fi
 
-# ── Task 4: Post-install WM instructions ────────────────────────────────────
+# ── Post-install WM instructions ────────────────────────────────────────────
 printf '\n%s\n' "${CYANF}=== Window Manager Configuration ===${RESET}"
 
 printf '\n%s\n' "${BLUEF}--- i3 (~/.config/i3/config) ---${RESET}"
 printf '%s\n' '  # Hotkey'
-printf '%s\n' '  bindsym $mod+e exec always-nvim'
+printf '%s\n' '  bindsym $mod+e exec "always-nvim"'
 printf '%s\n' ''
 printf '%s\n' '  # Floating window rule'
-printf '%s\n' '  for_window [title="always-nvim"] floating enable, sticky enable, resize set 800 600, move position center'
+printf '%s\n' '  for_window [class="always-nvim"] floating enable, sticky enable, resize set 1200 800, move position center'
 
 printf '\n%s\n' "${BLUEF}--- Hyprland (~/.config/hypr/hyprland.conf) ---${RESET}"
 printf '%s\n' '  # Hotkey'
@@ -107,8 +130,9 @@ hash -r 2>/dev/null || true
 if command -v always-nvim >/dev/null 2>&1; then
   printf '%s\n' "  ${GREENF}✓${RESET} always-nvim is in your PATH"
 else
-  printf '%s\n' "  ${YELLOWF}⚠${RESET} $INSTALL_DIR is NOT in your PATH. Add it to your shell profile:"
-  printf '%s\n' "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+  printf '%s\n' "  ${YELLOWF}⚠${RESET} always-nvim is NOT in your PATH"
+  printf '%s\n' "  The symlink at $SYMLINK_DIR/always-nvim should make it available."
+  printf '%s\n' "  If not, ensure $SYMLINK_DIR is in your PATH."
 fi
 
 printf '\n%s\n' "${GREENF}Installation complete!${RESET}"

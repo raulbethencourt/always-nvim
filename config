@@ -3,7 +3,7 @@
 #
 # All variables use the NA_ prefix
 
-NA_TERMINAL_CMD="alacritty --title always-nvim -e"
+NA_TERMINAL_CMD="alacritty --class always-nvim --title always-nvim -e"
 NA_BACKEND="auto"
 NA_CLEAR_PRIMARY="true"
 NA_FILETYPE="md"

@@ -1,5 +1,9 @@
 # always-nvim
 
+<p align="center">
+  <img src="always_nvim_logo.jpg" alt="always-nvim" width="400"/>
+</p>
+
 <!--toc:start-->
 - [always-nvim](#always-nvim)
   - [What It Does](#what-it-does)

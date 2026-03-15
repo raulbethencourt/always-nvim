@@ -35,34 +35,24 @@ Edit anywhere with Neovim -- a floating terminal that captures your clipboard, o
 
 always-nvim lets you use Neovim as a universal text input tool. Press a hotkey from any application, and a floating terminal appears with your selected text (or an empty buffer). Edit in Neovim, save and quit, and the edited content is pasted back into the original application. Your clipboard is restored automatically.
 
-```
- Hotkey pressed
-      |
-      v
- +-----------+     +-------------------+     +-------------------+
- | Save       | --> | Open floating     | --> | Edit in Neovim    |
- | clipboard  |     | terminal window   |     | (selection or     |
- | + selection |     | (Alacritty)       |     |  empty buffer)    |
- +-----------+     +-------------------+     +-------------------+
-                                                      |
-                                              :wq or :cq
-                                                      |
-                          +---------------------------+
-                          |                           |
-                    :wq (save)                  :cq (abort)
-                          |                           |
-                          v                           v
-                   +-------------+            +-------------+
-                   | Paste back  |            | Restore     |
-                   | to source   |            | clipboard   |
-                   | application |            | and exit    |
-                   +-------------+            +-------------+
-                          |
-                          v
-                   +-------------+
-                   | Restore     |
-                   | clipboard   |
-                   +-------------+
+```mermaid
+flowchart TD
+    A[Hotkey pressed] --> B[Save clipboard<br/>+ selection]
+    B --> C[Open floating<br/>terminal window]
+    C --> D[Edit in Neovim<br/>selection or empty buffer]
+    D --> E{Exit command}
+    E -->|:wq| F[Paste edited text<br/>to source app]
+    E -->|:cq| G[Skip paste<br/>abort operation]
+    F --> H[Restore<br/>clipboard]
+    G --> H
+    H --> I[Done]
+    
+    style A fill:#4a90d9,stroke:#333,stroke-width:2px
+    style C fill:#50c878,stroke:#333,stroke-width:2px
+    style D fill:#f4a460,stroke:#333,stroke-width:2px
+    style F fill:#50c878,stroke:#333,stroke-width:2px
+    style G fill:#f77f00,stroke:#333,stroke-width:2px
+    style H fill:#4a90d9,stroke:#333,stroke-width:2px
 ```
 
 ## Features

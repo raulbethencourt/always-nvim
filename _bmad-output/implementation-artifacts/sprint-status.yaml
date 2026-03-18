@@ -1,4 +1,5 @@
-# generated: 2026-03-11
+# generated: 2026-03-14
+# last_updated: 2026-03-14
 # project: nvimAlways
 # project_key: NOKEY
 # tracking_system: file-system
@@ -33,7 +34,8 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
-generated: 2026-03-11
+generated: 2026-03-14
+last_updated: 2026-03-14
 project: nvimAlways
 project_key: NOKEY
 tracking_system: file-system
@@ -65,7 +67,8 @@ development_status:
   4-1-nvim-appname-support: done
   epic-4-retrospective: done
 
-  epic-5: in-progress
+  epic-5: done
   5-1-neovim-server-architecture-spike: done
   5-2-neovim-server-daemon-implementation: cancelled
-  5-3-project-readme: review
+  5-3-project-readme: done
+  epic-5-retrospective: optional

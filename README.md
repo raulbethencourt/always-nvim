@@ -97,7 +97,7 @@ flowchart TD
 ```bash
 git clone https://github.com/user/always-nvim.git
 cd always-nvim
-./install.sh
+make install
 ```
 
 ### What the Install Script Does
@@ -110,7 +110,7 @@ cd always-nvim
 You can override the install directory with the `INSTALL_DIR` environment variable:
 
 ```bash
-INSTALL_DIR=/usr/local/bin ./install.sh
+export INSTALL_DIR=/usr/local/bin && make install
 ```
 
 ### Manual Installation
@@ -154,7 +154,7 @@ The config file is located at `~/.config/always-nvim/config`. It is a plain Bash
 ```bash
 # ~/.config/always-nvim/config
 
-NA_TERMINAL_CMD="kitty --title always-nvim -e"
+NA_TERMINAL_CMD="ghostty --class=always-nvim --title=always-nvim -e"
 NA_FILETYPE="txt"
 NA_PASTE_DELAY="0.3"
 NA_NVIM_APPNAME="always-nvim/nvim"

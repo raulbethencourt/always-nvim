@@ -49,3 +49,8 @@ backend_clear_primary() {
   # Clear primary selection to prevent stale data triggering Mode B (ADC-4)
   printf '' | xclip -selection primary -i
 }
+
+backend_cursor_to_end() {
+  # Right arrow moves cursor to end of selection (unselects)
+  xdotool key Right
+}

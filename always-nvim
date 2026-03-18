@@ -155,11 +155,9 @@ if [ "$nvim_exit" -eq 0 ]; then
   # Clear visual selection before exiting - move cursor to end of selection
   [ "$mode" = "B" ] && [ "$content" = "$selection" ] && {
     [ "$NA_CLEAR_PRIMARY" = "true" ] && {
-      # Refocus original window and move cursor to unselect
-      [ -n "$source_window" ] && hyprctl dispatch focuswindow "address:$source_window" 2>/dev/null
+      backend_refocus_window "$source_window"
       sleep 0.05
-      # Right arrow moves cursor to end of selection (unselects)
-      wtype -k Right
+      backend_cursor_to_end
     }
     exit 0
   }

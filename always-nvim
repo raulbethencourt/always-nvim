@@ -122,8 +122,8 @@ find /tmp -name "always-nvim-*" -mmin +60 -delete 2>/dev/null
 
 # ── Init Step 12: Determine mode (A = insert new / B = edit selection) ───────
 selection=$(backend_get_selection)
-# ADC-4: Clear primary selection to prevent stale data on next invocation
-[ "$NA_CLEAR_PRIMARY" = "true" ] && backend_clear_primary
+# Fallback to clipboard if primary is empty
+[ -z "$selection" ] && selection=$(backend_get_clipboard)
 [ -z "$selection" ] && mode="A" || mode="B"
 
 # ── Init Step 13: Create temp file + pre-fill (Mode B) ──────────────────────
@@ -152,7 +152,17 @@ nvim_exit=$?
 if [ "$nvim_exit" -eq 0 ]; then
   content=$(cat "$tmpfile")
   # AC3: Mode B no-change detection — skip paste if content unchanged (FR15)
-  [ "$mode" = "B" ] && [ "$content" = "$selection" ] && exit 0
+  # Clear visual selection before exiting - move cursor to end of selection
+  [ "$mode" = "B" ] && [ "$content" = "$selection" ] && {
+    [ "$NA_CLEAR_PRIMARY" = "true" ] && {
+      # Refocus original window and move cursor to unselect
+      [ -n "$source_window" ] && hyprctl dispatch focuswindow "address:$source_window" 2>/dev/null
+      sleep 0.05
+      # Right arrow moves cursor to end of selection (unselects)
+      wtype -k Right
+    }
+    exit 0
+  }
 
   [ -n "$content" ] && {
     # R1: Persistent backup before overwrite (survives crashes for manual recovery)

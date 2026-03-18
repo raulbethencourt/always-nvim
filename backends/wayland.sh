@@ -57,3 +57,8 @@ backend_clear_primary() {
   # Clear primary selection to prevent stale data triggering Mode B (ADC-4)
   printf '' | wl-copy --primary
 }
+
+backend_cursor_to_end() {
+  # Right arrow moves cursor to end of selection (unselects)
+  wtype -k Right
+}

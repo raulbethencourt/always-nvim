@@ -166,6 +166,11 @@ MOCK
   grep -q "hyprctl dispatch focuswindow address:0x5678abcd" "$LOG_FILE"
 }
 
+@test "Story 1.3: backend_cursor_to_end calls wtype -k Right" {
+  backend_cursor_to_end
+  grep -q "wtype -k Right" "$LOG_FILE"
+}
+
 @test "Story 1.3: wayland backend under 50 lines excluding comments" {
   local line_count
   line_count=$(grep -v '^\s*#' "$PROJECT_ROOT/backends/wayland.sh" | grep -cv '^\s*$')

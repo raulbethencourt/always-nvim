@@ -23,6 +23,8 @@ load test_helper
     "backend_simulate_paste"
     "backend_get_active_window"
     "backend_refocus_window"
+    "backend_clear_primary"
+    "backend_cursor_to_end"
   )
   for func in "${BACKEND_FUNCTIONS[@]}"; do
     run grep -q "${func}()" "$full_path"
@@ -53,6 +55,8 @@ load test_helper
     "backend_simulate_paste"
     "backend_get_active_window"
     "backend_refocus_window"
+    "backend_clear_primary"
+    "backend_cursor_to_end"
   )
   for func in "${BACKEND_FUNCTIONS[@]}"; do
     run grep -q "${func}()" "$full_path"

@@ -42,7 +42,8 @@ load test_helper
 }
 
 @test "Story 2.2: No-change detection exits 0 to trigger cleanup (AC#3)" {
-  grep -q '"$mode" = "B".*"$content" = "$selection".*exit 0' "$SCRIPT_PATH"
+  # exit 0 appears in the no-change block (mode B && content == selection)
+  grep -A10 '"$mode" = "B"' "$SCRIPT_PATH" | grep -q 'exit 0'
 }
 
 @test "Story 2.2: Lock file uses UID in filename for multi-user safety" {

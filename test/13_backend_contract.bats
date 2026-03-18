@@ -235,7 +235,7 @@ MOCK
 
 # ── Cross-backend parity: both backends define all 6 functions ───────────────
 
-@test "contract: X11 backend defines all 6 required functions" {
+@test "contract: X11 backend defines all 8 required functions" {
   setup_x11_mocks
 
   declare -f backend_get_selection >/dev/null
@@ -244,9 +244,11 @@ MOCK
   declare -f backend_simulate_paste >/dev/null
   declare -f backend_get_active_window >/dev/null
   declare -f backend_refocus_window >/dev/null
+  declare -f backend_clear_primary >/dev/null
+  declare -f backend_cursor_to_end >/dev/null
 }
 
-@test "contract: Wayland backend defines all 6 required functions" {
+@test "contract: Wayland backend defines all 8 required functions" {
   setup_wayland_mocks
 
   declare -f backend_get_selection >/dev/null
@@ -255,4 +257,6 @@ MOCK
   declare -f backend_simulate_paste >/dev/null
   declare -f backend_get_active_window >/dev/null
   declare -f backend_refocus_window >/dev/null
+  declare -f backend_clear_primary >/dev/null
+  declare -f backend_cursor_to_end >/dev/null
 }

@@ -16,6 +16,8 @@ MOCK_STATE_DIR="${MOCK_STATE_DIR:-$(mktemp -d /tmp/always-nvim-mock-XXXXXX)}"
 # ── Mock control variables (set these BEFORE calling mock functions) ─────────
 MOCK_PASTE_CALLED=0
 MOCK_REFOCUS_ARG=""
+MOCK_CURSOR_TO_END_CALLED=0
+MOCK_CLEAR_PRIMARY_CALLED=0
 
 # ── Mock backend functions (ADC-1: 6-function interface) ─────────────────────
 
@@ -46,6 +48,16 @@ backend_refocus_window() {
   printf '%s' "$1" >"$MOCK_STATE_DIR/refocus_arg"
 }
 
+backend_clear_primary() {
+  MOCK_CLEAR_PRIMARY_CALLED=1
+  printf '1' >"$MOCK_STATE_DIR/clear_primary_called"
+}
+
+backend_cursor_to_end() {
+  MOCK_CURSOR_TO_END_CALLED=1
+  printf '1' >"$MOCK_STATE_DIR/cursor_to_end_called"
+}
+
 # ── Helpers for reading captured mock state ──────────────────────────────────
 
 mock_get_clipboard_set() {
@@ -60,6 +72,14 @@ mock_get_refocus_arg() {
   [ -f "$MOCK_STATE_DIR/refocus_arg" ] && cat "$MOCK_STATE_DIR/refocus_arg"
 }
 
+mock_cursor_to_end_was_called() {
+  [ -f "$MOCK_STATE_DIR/cursor_to_end_called" ]
+}
+
+mock_clear_primary_was_called() {
+  [ -f "$MOCK_STATE_DIR/clear_primary_called" ]
+}
+
 mock_reset() {
   rm -rf "$MOCK_STATE_DIR"
   MOCK_STATE_DIR=$(mktemp -d /tmp/always-nvim-mock-XXXXXX)
@@ -68,4 +88,6 @@ mock_reset() {
   MOCK_WINDOW_ID="12345"
   MOCK_PASTE_CALLED=0
   MOCK_REFOCUS_ARG=""
+  MOCK_CURSOR_TO_END_CALLED=0
+  MOCK_CLEAR_PRIMARY_CALLED=0
 }

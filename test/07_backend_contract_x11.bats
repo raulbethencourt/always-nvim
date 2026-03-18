@@ -78,3 +78,8 @@ teardown() {
   backend_refocus_window "12345"
   grep -q "xdotool windowactivate 12345" "$LOG_FILE"
 }
+
+@test "Story 1.2: backend_cursor_to_end calls xdotool key Right" {
+  backend_cursor_to_end
+  grep -q "xdotool key Right" "$LOG_FILE"
+}

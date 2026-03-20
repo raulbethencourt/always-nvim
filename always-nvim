@@ -151,7 +151,7 @@ $NA_TERMINAL_CMD nvim "${nvim_args[@]}" "$tmpfile"
 nvim_exit=$?
 
 # ── Post-Edit: Paste flow (exit 0 = success, non-zero = abort) ──────────────
-if [ "$nvim_exit" -eq 0 ]; then
+[ "$nvim_exit" -eq 0 ] && {
   content=$(cat "$tmpfile")
   # AC3: Mode B no-change detection — skip paste if content unchanged (FR15)
   # Clear visual selection before exiting - move cursor to end of selection
@@ -182,4 +182,4 @@ if [ "$nvim_exit" -eq 0 ]; then
     # Wait for paste to be processed by target app
     sleep "$NA_PASTE_DELAY"
   }
-fi
+}

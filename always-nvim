@@ -122,9 +122,11 @@ find /tmp -name "always-nvim-*" -mmin +60 -delete 2>/dev/null
 
 # ── Init Step 12: Determine mode (A = insert new / B = edit selection) ───────
 selection=$(backend_get_selection)
+clipboard=$(backend_get_clipboard)
+
 # ADC-4: Clear primary selection to prevent stale data on next invocation
 [ "$NA_CLEAR_PRIMARY" = "true" ] && backend_clear_primary
-[ -z "$selection" ] && mode="A" || mode="B"
+[ -n "$selection" ] && [ "$selection" != "$clipboard" ] && mode="B" || mode="A"
 
 # ── Init Step 13: Create temp file + pre-fill (Mode B) ──────────────────────
 tmpfile=$(mktemp "/tmp/always-nvim-XXXXXX.$NA_FILETYPE")
